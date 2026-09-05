@@ -11,6 +11,9 @@ time-blocked day that fits the hours you actually have.
 
 [Run it locally in 30 seconds](#run-it-locally) · [How the algorithms work](#the-two-algorithms) · [Why AI never writes to the database](#why-ai-never-writes-to-the-database)
 
+[![CI](https://github.com/a-gupta123/momentum/actions/workflows/ci.yml/badge.svg)](https://github.com/a-gupta123/momentum/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
 </div>
 
 ---
