@@ -1,10 +1,13 @@
 name: CI
 
+# Both names are listed so a `master` → `main` rename does not silently stop
+# CI from running, which is the kind of breakage nobody notices until a broken
+# commit is already on the default branch.
 on:
   push:
-    branches: [main]
+    branches: [main, master]
   pull_request:
-    branches: [main]
+    branches: [main, master]
 
 # A force-push should not leave three redundant runs queued.
 concurrency:

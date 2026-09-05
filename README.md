@@ -352,7 +352,9 @@ An opt-in screenshot suite (`E2E_SHOTS=1`) regenerates the images above.
 
 **Vercel:** import the repo, add the environment variables you want, deploy.
 The build succeeds with everything unset — that configuration is exercised in
-CI on every push.
+CI on every push, and it deploys straight into Guest Demo mode.
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fa-gupta123%2Fmomentum)
 
 **Supabase:** run `supabase db push` against the linked project, then add
 `https://<your-domain>/auth/callback` to the allowed redirect URLs and set
