@@ -39,8 +39,7 @@ export const supabasePublishableKey = nonEmpty(publicEnv.NEXT_PUBLIC_SUPABASE_PU
  */
 export const isSupabaseConfigured = Boolean(supabaseUrl && supabasePublishableKey);
 
-export const appUrl =
-  nonEmpty(publicEnv.NEXT_PUBLIC_APP_URL) ?? 'http://localhost:3000';
+export const appUrl = nonEmpty(publicEnv.NEXT_PUBLIC_APP_URL) ?? 'http://localhost:3000';
 
 /**
  * What this deployment can actually do. Resolved on the server and handed to

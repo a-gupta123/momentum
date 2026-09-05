@@ -1,12 +1,16 @@
-import { dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { FlatCompat } from '@eslint/eslintrc';
+import nextCoreWebVitals from 'eslint-config-next/core-web-vitals';
+import nextTypeScript from 'eslint-config-next/typescript';
+import prettier from 'eslint-config-prettier';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-const compat = new FlatCompat({ baseDirectory: __dirname });
-
+/**
+ * Flat config, composed by importing the shared configs directly.
+ *
+ * Not routed through `FlatCompat`: `eslint-config-next` already exports flat
+ * config arrays, so wrapping them in the eslintrc compatibility layer re-runs
+ * them through legacy schema validation, which fails on the plugin object
+ * graph and surfaces as "Converting circular structure to JSON" — an error
+ * that names neither the config nor the rule responsible.
+ */
 const config = [
   {
     ignores: [
@@ -16,10 +20,15 @@ const config = [
       'coverage/**',
       'playwright-report/**',
       'test-results/**',
+      'screenshots/**',
       'next-env.d.ts',
     ],
   },
-  ...compat.extends('next/core-web-vitals', 'next/typescript', 'prettier'),
+
+  ...nextCoreWebVitals,
+  ...nextTypeScript,
+  prettier,
+
   {
     rules: {
       '@typescript-eslint/no-explicit-any': 'error',
@@ -28,12 +37,14 @@ const config = [
         { argsIgnorePattern: '^_', varsIgnorePattern: '^_', caughtErrorsIgnorePattern: '^_' },
       ],
       '@typescript-eslint/consistent-type-imports': ['error', { prefer: 'type-imports' }],
-      'no-console': ['warn', { allow: ['warn', 'error'] }],
+      'no-console': 'error',
       eqeqeq: ['error', 'always', { null: 'ignore' }],
     },
   },
+
   {
-    files: ['tests/**/*.ts', 'tests/**/*.tsx', 'scripts/**/*.ts'],
+    // Tests may log; a failing assertion is often clearer with context.
+    files: ['tests/**/*.ts', 'tests/**/*.tsx'],
     rules: { 'no-console': 'off' },
   },
 ];

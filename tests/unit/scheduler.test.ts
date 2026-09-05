@@ -71,10 +71,9 @@ function expectNoOverlaps(result: DaySchedule): void {
     const previous = occupied[index - 1];
     const current = occupied[index];
     if (!previous || !current) continue;
-    expect(
-      current.start,
-      `${current.id} starts before ${previous.id} ends`,
-    ).toBeGreaterThanOrEqual(previous.end);
+    expect(current.start, `${current.id} starts before ${previous.id} ends`).toBeGreaterThanOrEqual(
+      previous.end,
+    );
   }
 }
 
@@ -558,5 +557,53 @@ describe('diagnostics', () => {
 
     expect(result.diagnostics.utilization).toBe(1);
     expect(result.diagnostics.warnings.some((warning) => /nearly full/i.test(warning))).toBe(true);
+  });
+
+  /**
+   * The number the header shows has to be capacity the user still *has*.
+   * Reporting the whole workday at 3pm is the single most misleading thing a
+   * planner can do, because it is the number people commit against.
+   */
+  it('measures capacity from now, not from the start of the workday', () => {
+    const midday = schedule({
+      // 14:00 local on the day being planned, leaving three hours of workday.
+      now: new Date('2026-03-10T18:00:00.000Z'),
+    });
+
+    expect(midday.diagnostics.availableMinutes).toBe(3 * 60);
+  });
+
+  it('subtracts only the fixed commitments that are still ahead', () => {
+    const result = schedule({
+      now: new Date('2026-03-10T18:00:00.000Z'),
+      fixedBlocks: [
+        // Already over by 14:00, so it cannot reduce remaining capacity.
+        { id: 'past', taskId: null, title: 'Standup', startAt: at('09:00'), endAt: at('10:00') },
+        { id: 'ahead', taskId: null, title: 'Lecture', startAt: at('15:00'), endAt: at('16:00') },
+      ],
+    });
+
+    expect(result.diagnostics.availableMinutes).toBe(3 * 60 - 60);
+    // `fixedMinutes` still reports the whole day: it describes commitments,
+    // not remaining capacity.
+    expect(result.diagnostics.fixedMinutes).toBe(120);
+  });
+
+  it('reports no capacity once the workday has passed', () => {
+    const evening = schedule({ now: new Date('2026-03-10T23:00:00.000Z') });
+
+    expect(evening.diagnostics.availableMinutes).toBe(0);
+    expect(evening.diagnostics.freeMinutes).toBe(0);
+    expect(evening.diagnostics.utilization).toBe(0);
+  });
+
+  it('keeps free minutes within the capacity it reports', () => {
+    const result = schedule({
+      now: new Date('2026-03-10T18:00:00.000Z'),
+      tasks: [makeSchedulable({ id: 'a', durationMinutes: 60, score: 90 })],
+    });
+
+    const { availableMinutes, scheduledMinutes, freeMinutes, bufferMinutes } = result.diagnostics;
+    expect(scheduledMinutes + freeMinutes + bufferMinutes).toBe(availableMinutes);
   });
 });

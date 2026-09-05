@@ -60,7 +60,10 @@ export function normalizeRecurrenceRule(input: string | null | undefined): strin
     if (options.freq === undefined || options.freq === null) return null;
     // Round-trip through RRule so the output is canonically ordered.
     const rule = new RRule({ ...options, dtstart: new Date(Date.UTC(2024, 0, 1)) });
-    return rule.toString().replace(/^DTSTART:[^\n]*\n?/i, '').replace(/^RRULE:/i, '');
+    return rule
+      .toString()
+      .replace(/^DTSTART:[^\n]*\n?/i, '')
+      .replace(/^RRULE:/i, '');
   } catch {
     return null;
   }
@@ -82,8 +85,9 @@ export function recurrenceFromPhrase(phrase: string): string | null {
   if (/\bevery (week|7 days)\b|\bweekly\b/.test(text)) return 'FREQ=WEEKLY';
   if (/\bevery month\b|\bmonthly\b/.test(text)) return 'FREQ=MONTHLY';
 
-  const dayMatch =
-    /\bevery (monday|tuesday|wednesday|thursday|friday|saturday|sunday)s?\b/.exec(text);
+  const dayMatch = /\bevery (monday|tuesday|wednesday|thursday|friday|saturday|sunday)s?\b/.exec(
+    text,
+  );
   if (dayMatch?.[1]) {
     const code = Object.entries(WEEKDAY_NAMES).find(
       ([, name]) => name.toLowerCase() === dayMatch[1],
@@ -154,11 +158,7 @@ function fromFloating(floating: Date, timezone: string): Date {
  * The next instant a rule fires strictly after `anchor`, preserving the
  * anchor's wall-clock time of day across DST boundaries.
  */
-export function nextOccurrence(
-  rule: string,
-  anchor: Date,
-  timezone: string,
-): Date | null {
+export function nextOccurrence(rule: string, anchor: Date, timezone: string): Date | null {
   const normalized = normalizeRecurrenceRule(rule);
   if (!normalized) return null;
 

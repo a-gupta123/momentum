@@ -139,12 +139,8 @@ describe('goal alignment', () => {
     const unlinked = makeTask({ goalId: null });
 
     const context = contextFor([goal]);
-    expect(scoreTask(linked, context).score).toBeGreaterThan(
-      scoreTask(unlinked, context).score,
-    );
-    expect(scoreTask(linked, context).topReasons).toContain(
-      'Supports your highest-priority goal',
-    );
+    expect(scoreTask(linked, context).score).toBeGreaterThan(scoreTask(unlinked, context).score);
+    expect(scoreTask(linked, context).topReasons).toContain('Supports your highest-priority goal');
   });
 
   it('discounts a paused goal without erasing its contribution', () => {

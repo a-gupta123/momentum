@@ -97,9 +97,9 @@ describe('schema rejection of malformed AI output', () => {
 
   it('rejects a duration outside the domain limits', () => {
     expect(assistantActionSchema.safeParse(createTask({ durationMinutes: 1 })).success).toBe(false);
-    expect(
-      assistantActionSchema.safeParse(createTask({ durationMinutes: 100_000 })).success,
-    ).toBe(false);
+    expect(assistantActionSchema.safeParse(createTask({ durationMinutes: 100_000 })).success).toBe(
+      false,
+    );
     expect(assistantActionSchema.safeParse(createTask({ durationMinutes: 45.5 })).success).toBe(
       false,
     );
@@ -191,9 +191,7 @@ describe('hallucinated identifiers', () => {
   });
 
   it('keeps the task but strips an invented goal link, since that is recoverable', () => {
-    const plan = planWith([
-      assistantActionSchema.parse(createTask({ goalId: 'goal-invented' })),
-    ]);
+    const plan = planWith([assistantActionSchema.parse(createTask({ goalId: 'goal-invented' }))]);
 
     const result = validatePlanAgainstContext(plan, known);
     expect(result.plan.actions).toHaveLength(1);

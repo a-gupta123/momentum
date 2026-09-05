@@ -11,13 +11,7 @@
  * week without any real person's private data: no email addresses, no course
  * numbers, no grades, no application outcomes.
  */
-import {
-  addDayKeys,
-  addMinutesTo,
-  toIso,
-  todayKey,
-  zonedTimeToInstant,
-} from '@/lib/dates';
+import { addDayKeys, addMinutesTo, toIso, todayKey, zonedTimeToInstant } from '@/lib/dates';
 import { newId } from '@/lib/domain/ids';
 import type {
   ActivityEvent,
@@ -146,9 +140,7 @@ export function buildDemoState(options: DemoSeedOptions): GuestState {
   const tasks: Task[] = [];
   const events: ActivityEvent[] = [];
 
-  const addTask = (
-    overrides: Partial<Task> & Pick<Task, 'title' | 'durationMinutes'>,
-  ): Task => {
+  const addTask = (overrides: Partial<Task> & Pick<Task, 'title' | 'durationMinutes'>): Task => {
     position += 1;
     const task: Task = {
       id: generateId(),

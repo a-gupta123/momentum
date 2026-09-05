@@ -31,11 +31,9 @@ import {
 } from '@/lib/domain/types';
 
 /** ISO-8601 instant. Kept as a plain string in JSON Schema; validated here. */
-const isoDateTime = z
-  .string()
-  .refine((value) => !Number.isNaN(Date.parse(value)), {
-    message: 'Expected an ISO-8601 date-time string',
-  });
+const isoDateTime = z.string().refine((value) => !Number.isNaN(Date.parse(value)), {
+  message: 'Expected an ISO-8601 date-time string',
+});
 
 /** `yyyy-MM-dd` calendar date. */
 const dayKey = z
@@ -218,6 +216,17 @@ export const assistantPlanSchema = z.strictObject({
 export type AmbiguityDetail = z.infer<typeof ambiguitySchema>;
 export type AssistantAction = z.infer<typeof assistantActionSchema>;
 export type AssistantActionType = AssistantAction['type'];
+
+/**
+ * The discriminator values, derived from the union rather than retyped, so a
+ * new intent cannot be added without every consumer of this list seeing it.
+ */
+export const assistantActionTypeSchema = z.enum(
+  assistantActionSchema.options.map((option) => option.shape.type.value) as [
+    AssistantActionType,
+    ...AssistantActionType[],
+  ],
+);
 export type AssistantPlan = z.infer<typeof assistantPlanSchema>;
 
 export type CreateTaskAction = z.infer<typeof createTaskActionSchema>;

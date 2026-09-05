@@ -36,13 +36,7 @@ import {
   SCORE_VERSION,
   type SchedulingConfig,
 } from '@/lib/domain/tuning';
-import type {
-  BlockType,
-  ClockTime,
-  DayKey,
-  EnergyLevel,
-  IsoDateTime,
-} from '@/lib/domain/types';
+import type { BlockType, ClockTime, DayKey, EnergyLevel, IsoDateTime } from '@/lib/domain/types';
 
 /** A commitment the scheduler may never move: a class, a meeting, a locked block. */
 export interface FixedBlockInput {
@@ -126,8 +120,12 @@ export interface ScheduleConflict {
 }
 
 export interface ScheduleDiagnostics {
-  /** Minutes inside the workday that were not already consumed by fixed blocks. */
+  /**
+   * Minutes still ahead in the workday and not claimed by a fixed commitment.
+   * For today this starts at the current time, not at the workday's start.
+   */
   availableMinutes: number;
+  /** Minutes of fixed commitments across the whole day, past ones included. */
   fixedMinutes: number;
   scheduledMinutes: number;
   bufferMinutes: number;
@@ -257,7 +255,30 @@ export function buildDaySchedule(input: SchedulerInput): DaySchedule {
     fixedMinutesInsideWindow += Math.max(0, endSlot - startSlot) * slotMinutes;
   }
 
-  const availableMinutes = Math.max(0, slotCount * slotMinutes - fixedMinutesInsideWindow);
+  // Earliest slot we may use: never schedule into the past on the current day.
+  const isToday = dayKeyOf(input.now, timezone) === date;
+  const minSlot = isToday
+    ? clamp(
+        Math.ceil((input.now.getTime() - baseGrid.windowStartMs) / (slotMinutes * MS_PER_MINUTE)),
+        0,
+        slotCount,
+      )
+    : 0;
+
+  /**
+   * Capacity is measured from `minSlot`, not from the top of the workday.
+   *
+   * Opening the app at 3pm and being told eleven hours are available is worse
+   * than useless — it is precisely the number that makes people overcommit.
+   * What matters is the time still ahead of them that is not already spoken
+   * for, and measuring `freeMinutes` and `utilization` against the same base
+   * keeps the three numbers from contradicting each other on screen.
+   */
+  let availableSlots = 0;
+  for (let slot = minSlot; slot < slotCount; slot += 1) {
+    if (baseGrid.slots[slot] !== FIXED) availableSlots += 1;
+  }
+  const availableMinutes = availableSlots * slotMinutes;
 
   // --- Step 3: separate what may be auto-scheduled from what may not. --------
   const schedulable: SchedulableTaskInput[] = [];
@@ -277,16 +298,6 @@ export function buildDaySchedule(input: SchedulerInput): DaySchedule {
     if (task.durationMinutes <= 0) continue;
     schedulable.push(task);
   }
-
-  // Earliest slot we may use: never schedule into the past on the current day.
-  const isToday = dayKeyOf(input.now, timezone) === date;
-  const minSlot = isToday
-    ? clamp(
-        Math.ceil((input.now.getTime() - baseGrid.windowStartMs) / (slotMinutes * MS_PER_MINUTE)),
-        0,
-        slotCount,
-      )
-    : 0;
 
   const energyWindow = resolveSlotWindow(
     baseGrid,
@@ -646,10 +657,7 @@ function commitPlacement(grid: Grid, placement: Placement, bufferSlots: number):
     }
     // Reserve the break buffer immediately after the block so focus work never
     // lands back-to-back. Buffer slots are reported separately in diagnostics.
-    const bufferEnd = Math.min(
-      chunk.startSlot + chunk.slotLength + bufferSlots,
-      grid.slotCount,
-    );
+    const bufferEnd = Math.min(chunk.startSlot + chunk.slotLength + bufferSlots, grid.slotCount);
     for (let slot = chunk.startSlot + chunk.slotLength; slot < bufferEnd; slot += 1) {
       if (grid.slots[slot] === FREE) grid.slots[slot] = BUFFER;
     }
@@ -837,7 +845,8 @@ function buildBreakBlocks(run: PlacementRun, context: PlacementContext): Schedul
     const end = slot;
 
     const precededByWork = start > 0 && grid.slots[start - 1] === TASK;
-    const followedByWork = end < grid.slotCount && (grid.slots[end] === TASK || grid.slots[end] === FIXED);
+    const followedByWork =
+      end < grid.slotCount && (grid.slots[end] === TASK || grid.slots[end] === FIXED);
     if (!precededByWork || !followedByWork) continue;
 
     const startAt = slotToInstant(grid, start);

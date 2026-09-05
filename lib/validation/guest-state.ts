@@ -59,13 +59,7 @@ const goalSchema = z.object({
   title: z.string().min(1).max(120),
   description: z.string().max(1000).nullable(),
   category: z.enum(GOAL_CATEGORIES),
-  priorityWeight: z.union([
-    z.literal(1),
-    z.literal(2),
-    z.literal(3),
-    z.literal(4),
-    z.literal(5),
-  ]),
+  priorityWeight: z.union([z.literal(1), z.literal(2), z.literal(3), z.literal(4), z.literal(5)]),
   targetDate: dayKey.nullable(),
   weeklyTargetMinutes: z.number().int().min(0).max(10_080).nullable(),
   status: z.enum(GOAL_STATUSES),
@@ -83,13 +77,7 @@ const taskSchema = z.object({
   notes: z.string().max(4000).nullable(),
   status: z.enum(TASK_STATUSES),
   manualPriority: z.enum(MANUAL_PRIORITIES),
-  importance: z.union([
-    z.literal(1),
-    z.literal(2),
-    z.literal(3),
-    z.literal(4),
-    z.literal(5),
-  ]),
+  importance: z.union([z.literal(1), z.literal(2), z.literal(3), z.literal(4), z.literal(5)]),
   energy: z.enum(ENERGY_LEVELS),
   dueAt: isoDateTime.nullable(),
   scheduledStart: isoDateTime.nullable(),
@@ -148,10 +136,7 @@ const activityEventSchema = z.object({
   eventType: z.enum(ACTIVITY_EVENT_TYPES),
   occurredAt: isoDateTime,
   durationMinutes: z.number().int().min(0).max(10_080).nullable(),
-  metadata: z.record(
-    z.string(),
-    z.union([z.string(), z.number(), z.boolean(), z.null()]),
-  ),
+  metadata: z.record(z.string(), z.union([z.string(), z.number(), z.boolean(), z.null()])),
 });
 
 const focusSessionSchema = z.object({
@@ -220,8 +205,7 @@ export function loadGuestState(raw: string | null): GuestStateLoadOutcome {
 }
 
 type MigrationResult =
-  | { ok: true; value: unknown; migratedFrom: number | null }
-  | { ok: false; reason: string };
+  { ok: true; value: unknown; migratedFrom: number | null } | { ok: false; reason: string };
 
 /**
  * Steps an older payload up to the current version.

@@ -24,7 +24,14 @@ import {
   parseIso,
   todayKey,
 } from '@/lib/dates';
-import type { ActivityEvent, DayKey, Goal, GoalCategory, Task } from '@/lib/domain/types';
+import type {
+  ActivityEvent,
+  DayKey,
+  Goal,
+  GoalCategory,
+  GoalColorToken,
+  Task,
+} from '@/lib/domain/types';
 
 export interface InsightsInput {
   tasks: readonly Task[];
@@ -62,7 +69,8 @@ export interface GoalInvestmentSlice {
   goalId: string | null;
   label: string;
   category: GoalCategory | 'unassigned';
-  color: string;
+  /** Palette token, resolved to a CSS variable at render time. */
+  color: GoalColorToken;
   minutes: number;
   taskCount: number;
   /** Share of total invested minutes, 0–1. */
@@ -104,7 +112,7 @@ export interface WeekChangeMetric {
 export interface GoalAttention {
   goalId: string;
   title: string;
-  color: string;
+  color: GoalColorToken;
   priorityWeight: number;
   plannedMinutesThisWeek: number;
   weeklyTargetMinutes: number | null;
@@ -175,8 +183,7 @@ export function computeInsights(input: InsightsInput): InsightsSummary {
       completedMinutes: sum(completed.map((task) => task.durationMinutes)),
       completedCount: completed.length,
       scheduledCount: scheduled.length,
-      completionRate:
-        scheduled.length > 0 ? round3(scheduledCompleted / scheduled.length) : null,
+      completionRate: scheduled.length > 0 ? round3(scheduledCompleted / scheduled.length) : null,
     };
   });
 
@@ -214,11 +221,7 @@ export function computeInsights(input: InsightsInput): InsightsSummary {
  * was yesterday and today is still in progress, the streak is not yet broken.
  * Anything older than yesterday means the streak has lapsed to zero.
  */
-export function computeStreak(
-  tasks: readonly Task[],
-  timezone: string,
-  now: Date,
-): StreakSummary {
+export function computeStreak(tasks: readonly Task[], timezone: string, now: Date): StreakSummary {
   const activeDays = new Set<DayKey>();
   for (const task of tasks) {
     const completedAt = parseIso(task.completedAt);
@@ -251,7 +254,9 @@ export function computeStreak(
   }
 
   const lastActiveDay = sorted[sorted.length - 1] ?? null;
-  const gapFromToday = lastActiveDay ? dayKeyDifference(lastActiveDay, today) : Number.MAX_SAFE_INTEGER;
+  const gapFromToday = lastActiveDay
+    ? dayKeyDifference(lastActiveDay, today)
+    : Number.MAX_SAFE_INTEGER;
 
   let current = 0;
   if (gapFromToday <= 1) {

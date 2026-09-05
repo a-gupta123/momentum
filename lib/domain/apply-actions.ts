@@ -69,8 +69,7 @@ export function planMutations(
   const deferred: OptimizeDayAction[] = [];
   const skipped: PlannedMutations['skipped'] = [];
 
-  let nextPosition =
-    context.tasks.reduce((max, task) => Math.max(max, task.position), 0) + 1;
+  let nextPosition = context.tasks.reduce((max, task) => Math.max(max, task.position), 0) + 1;
 
   const logEvent = (
     eventType: ActivityEvent['eventType'],
@@ -94,8 +93,7 @@ export function planMutations(
   actions.forEach((action, index) => {
     switch (action.type) {
       case 'create_task': {
-        const duration =
-          action.durationMinutes ?? context.profile.defaultTaskDurationMinutes;
+        const duration = action.durationMinutes ?? context.profile.defaultTaskDurationMinutes;
         const scheduledStart = parseIso(action.scheduledStart);
         const task: Task = {
           id: generateId(),
@@ -110,9 +108,7 @@ export function planMutations(
           energy: action.energy ?? 'medium',
           dueAt: action.dueAt,
           scheduledStart: action.scheduledStart,
-          scheduledEnd: scheduledStart
-            ? toIso(addMinutesTo(scheduledStart, duration))
-            : null,
+          scheduledEnd: scheduledStart ? toIso(addMinutesTo(scheduledStart, duration)) : null,
           durationMinutes: duration,
           actualMinutes: null,
           isFixedTime: action.isFixedTime,

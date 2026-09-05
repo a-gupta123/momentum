@@ -222,9 +222,7 @@ describe('priority and recurrence', () => {
   });
 
   it('reads a single weekday recurrence', () => {
-    expect(firstTask('Team sync every Monday at 10am').recurrenceRule).toBe(
-      'FREQ=WEEKLY;BYDAY=MO',
-    );
+    expect(firstTask('Team sync every Monday at 10am').recurrenceRule).toBe('FREQ=WEEKLY;BYDAY=MO');
   });
 });
 
@@ -290,7 +288,10 @@ describe('declining to guess', () => {
   it('never fabricates a title from meaningless input', () => {
     for (const input of ['???', '...', '42', 'x']) {
       const plan = parseCaptureDeterministically(input, contextFor());
-      expect(plan.actions.every((action) => action.type !== 'create_task'), input).toBe(true);
+      expect(
+        plan.actions.every((action) => action.type !== 'create_task'),
+        input,
+      ).toBe(true);
     }
   });
 

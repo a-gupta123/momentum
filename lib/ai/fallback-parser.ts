@@ -264,10 +264,7 @@ export function parseCaptureDeterministically(
   return { summary: buildSummary(actions), actions };
 }
 
-function parseSingleLine(
-  line: string,
-  context: FallbackParseContext,
-): AssistantAction | null {
+function parseSingleLine(line: string, context: FallbackParseContext): AssistantAction | null {
   let working = line;
 
   // --- Recurrence ----------------------------------------------------------
@@ -322,7 +319,9 @@ function parseSingleLine(
 
   const interpretationParts: string[] = [];
   if (timing?.kind === 'due') {
-    interpretationParts.push(`due ${describeInstant(timing.instant, context.timezone, timing.hasTime)}`);
+    interpretationParts.push(
+      `due ${describeInstant(timing.instant, context.timezone, timing.hasTime)}`,
+    );
   } else if (timing?.kind === 'scheduled') {
     interpretationParts.push(
       `scheduled ${describeInstant(timing.instant, context.timezone, timing.hasTime)}`,
@@ -389,7 +388,11 @@ export function extractDuration(text: string): DurationMatch | null {
   if (minutes < DOMAIN_LIMITS.minTaskDurationMinutes) return null;
 
   return {
-    minutes: clamp(minutes, DOMAIN_LIMITS.minTaskDurationMinutes, DOMAIN_LIMITS.maxTaskDurationMinutes),
+    minutes: clamp(
+      minutes,
+      DOMAIN_LIMITS.minTaskDurationMinutes,
+      DOMAIN_LIMITS.maxTaskDurationMinutes,
+    ),
     matchText: match[0],
   };
 }
@@ -411,21 +414,14 @@ interface TimingMatch {
  * only the first result would silently drop the time and quietly file the task
  * at the end of the day.
  */
-export function extractTiming(
-  text: string,
-  context: FallbackParseContext,
-): TimingMatch | null {
+export function extractTiming(text: string, context: FallbackParseContext): TimingMatch | null {
   const { timezone, now } = context;
 
   // Project the reference into a floating frame so chrono's UTC math lines up
   // with the user's wall clock, and force offset 0 so it adds no shift of its own.
   const floatingRef = new Date(`${formatInZone(now, timezone, "yyyy-MM-dd'T'HH:mm:ss")}Z`);
 
-  const results = chrono.parse(
-    text,
-    { instant: floatingRef, timezone: 0 },
-    { forwardDate: true },
-  );
+  const results = chrono.parse(text, { instant: floatingRef, timezone: 0 }, { forwardDate: true });
   if (results.length === 0) return null;
 
   const dateSource = results.find((result) => result.start.isCertain('day')) ?? results[0];
@@ -493,10 +489,7 @@ interface GoalMatch {
  * silently attaching work to the wrong goal quietly corrupts every ranking and
  * every insight that follows.
  */
-export function matchGoal(
-  text: string,
-  goals: readonly FallbackGoalCandidate[],
-): GoalMatch {
+export function matchGoal(text: string, goals: readonly FallbackGoalCandidate[]): GoalMatch {
   if (goals.length === 0) return { goalId: null, goalTitle: null, ambiguity: null };
 
   const lower = text.toLowerCase();

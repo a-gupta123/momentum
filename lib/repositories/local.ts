@@ -11,7 +11,7 @@
  * refuses to persist — private windows and full quotas should make Momentum
  * *lossy*, never broken.
  */
-import { addMinutesTo, dayKeyOf, parseIso, toIso, todayKey } from '@/lib/dates';
+import { addMinutesTo, parseIso, toIso, todayKey } from '@/lib/dates';
 import { buildDemoState } from '@/lib/domain/demo-data';
 import { newId } from '@/lib/domain/ids';
 import { buildNextOccurrence } from '@/lib/domain/recurrence';
@@ -21,11 +21,9 @@ import type {
   DayKey,
   FocusSession,
   Goal,
-  Importance,
   IsoDateTime,
   PlanBlock,
   PlannerSnapshot,
-  PriorityWeight,
   Profile,
   Task,
 } from '@/lib/domain/types';
@@ -37,7 +35,6 @@ import {
 } from '@/lib/validation/guest-state';
 import {
   StaleWriteError,
-  StorageUnavailableError,
   type CompleteTaskResult,
   type CreateGoalInput,
   type CreateTaskInput,
@@ -419,12 +416,7 @@ export class LocalPlannerRepository implements PlannerRepository {
 
     let nextOccurrence: Task | null = null;
     if (existing.recurrenceRule) {
-      const candidate = buildNextOccurrence(
-        existing,
-        this.timezone,
-        this.now(),
-        this.generateId(),
-      );
+      const candidate = buildNextOccurrence(existing, this.timezone, this.now(), this.generateId());
       if (candidate) {
         const seriesId = candidate.recurrenceSeriesId;
         const alreadyExists = this.state.tasks.some(
@@ -487,9 +479,7 @@ export class LocalPlannerRepository implements PlannerRepository {
     this.commit((state) => {
       state.tasks = state.tasks.map((task) => {
         const position = positionById.get(task.id);
-        return position === undefined
-          ? task
-          : { ...task, position, updatedAt: this.nowIso() };
+        return position === undefined ? task : { ...task, position, updatedAt: this.nowIso() };
       });
     });
   }
@@ -646,10 +636,7 @@ export class LocalPlannerRepository implements PlannerRepository {
 
     this.commit((state) => {
       state.plans = [...state.plans.filter((entry) => entry.planDate !== schedule.date), plan];
-      state.blocks = [
-        ...state.blocks.filter((block) => block.dailyPlanId !== planId),
-        ...blocks,
-      ];
+      state.blocks = [...state.blocks.filter((block) => block.dailyPlanId !== planId), ...blocks];
 
       // Mirror task blocks onto the tasks themselves so the queue, the ranked
       // list and the timeline all agree on when work is scheduled.
@@ -776,10 +763,7 @@ export class LocalPlannerRepository implements PlannerRepository {
             });
             break;
           }
-          if (
-            mutation.expectedUpdatedAt &&
-            existing.updatedAt !== mutation.expectedUpdatedAt
-          ) {
+          if (mutation.expectedUpdatedAt && existing.updatedAt !== mutation.expectedUpdatedAt) {
             outcome.rejected.push({
               index,
               kind: mutation.kind,
@@ -831,10 +815,7 @@ export class LocalPlannerRepository implements PlannerRepository {
             });
             break;
           }
-          if (
-            mutation.expectedUpdatedAt &&
-            existing.updatedAt !== mutation.expectedUpdatedAt
-          ) {
+          if (mutation.expectedUpdatedAt && existing.updatedAt !== mutation.expectedUpdatedAt) {
             outcome.rejected.push({
               index,
               kind: mutation.kind,

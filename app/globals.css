@@ -1,0 +1,600 @@
+@import 'tailwindcss';
+
+/*
+ * Momentum design system.
+ *
+ * The look is "editorial productivity tool": a warm ivory canvas with crisp
+ * white surfaces in light mode, a near-black navy canvas with lifted slate
+ * surfaces in dark mode, cobalt as the single accent, coral reserved strictly
+ * for urgency and green strictly for completion.
+ *
+ * Colors are authored in OKLCH so that lightness steps stay perceptually even
+ * across hues — the reason the goal palette can be recolored without any swatch
+ * suddenly looking heavier than its neighbours.
+ *
+ * Every value below is a token. Components reference tokens, never raw colors,
+ * which is what makes the two themes a data change rather than a code change.
+ */
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  color-scheme: light;
+
+  /* Surfaces, from the page backdrop up to the most elevated card. */
+  --canvas: oklch(0.978 0.0075 83);
+  --canvas-tint: oklch(0.962 0.011 82);
+  --surface: oklch(1 0 0);
+  --surface-muted: oklch(0.98 0.006 84);
+  --surface-sunken: oklch(0.955 0.009 82);
+  --surface-hover: oklch(0.972 0.008 83);
+
+  /* Text, graphite rather than pure black so long reading stays comfortable. */
+  --ink: oklch(0.268 0.014 264);
+  --ink-muted: oklch(0.505 0.016 262);
+  --ink-subtle: oklch(0.635 0.014 262);
+  --ink-inverted: oklch(0.99 0.002 84);
+
+  /* Hairline borders. `subtle` divides regions *inside* one surface, where a
+     full-strength line would read as two separate cards; `strong` is for
+     deliberate separation only. */
+  --line-subtle: oklch(0.941 0.006 84);
+  --line: oklch(0.907 0.008 84);
+  --line-strong: oklch(0.855 0.011 83);
+
+  /* Cobalt: the one accent. */
+  --primary: oklch(0.505 0.186 262);
+  --primary-hover: oklch(0.452 0.19 262);
+  --primary-soft: oklch(0.945 0.032 262);
+  --primary-border: oklch(0.86 0.06 262);
+  --primary-ink: oklch(0.99 0.005 262);
+
+  /* Coral: urgency and overdue only. Never decoration. */
+  --urgent: oklch(0.585 0.196 27);
+  --urgent-soft: oklch(0.955 0.032 30);
+  --urgent-border: oklch(0.87 0.07 30);
+  --urgent-ink: oklch(0.42 0.15 27);
+
+  /* Green: completion only. */
+  --success: oklch(0.555 0.135 157);
+  --success-soft: oklch(0.952 0.036 157);
+  --success-border: oklch(0.86 0.07 157);
+  --success-ink: oklch(0.4 0.1 157);
+
+  /* Amber: capacity warnings that are not yet failures. */
+  --warning: oklch(0.68 0.145 68);
+  --warning-soft: oklch(0.965 0.045 78);
+  --warning-border: oklch(0.885 0.08 75);
+  --warning-ink: oklch(0.45 0.1 62);
+
+  --ring: oklch(0.505 0.186 262);
+
+  /* Accessible goal palette. Each pairs with `--goal-*-soft` for fills. */
+  --goal-cobalt: oklch(0.53 0.18 262);
+  --goal-teal: oklch(0.56 0.108 195);
+  --goal-violet: oklch(0.53 0.175 300);
+  --goal-amber: oklch(0.665 0.145 72);
+  --goal-coral: oklch(0.6 0.19 27);
+  --goal-moss: oklch(0.545 0.115 145);
+  --goal-slate: oklch(0.5 0.032 258);
+  --goal-rose: oklch(0.585 0.17 5);
+
+  /* Chart series, ordered for maximum adjacent contrast. */
+  --chart-1: var(--goal-cobalt);
+  --chart-2: var(--goal-teal);
+  --chart-3: var(--goal-violet);
+  --chart-4: var(--goal-amber);
+  --chart-5: var(--goal-moss);
+  --chart-grid: oklch(0.905 0.008 84);
+
+  /* Timeline scale. */
+  --timeline-line: oklch(0.9 0.009 84);
+  --timeline-now: oklch(0.585 0.196 27);
+
+  /* Radii. Intentional, 10–24px; not every element is a floating card. */
+  --radius-xs: 8px;
+  --radius-sm: 11px;
+  --radius-md: 14px;
+  --radius-lg: 18px;
+  --radius-xl: 24px;
+
+  /* Soft, low-contrast elevation. Shadows suggest depth, they do not shout. */
+  --shadow-xs: 0 1px 2px oklch(0.3 0.02 262 / 0.05);
+  --shadow-sm: 0 1px 3px oklch(0.3 0.02 262 / 0.06), 0 1px 2px oklch(0.3 0.02 262 / 0.04);
+  --shadow-md: 0 4px 12px oklch(0.3 0.02 262 / 0.07), 0 1px 3px oklch(0.3 0.02 262 / 0.05);
+  --shadow-lg: 0 12px 32px oklch(0.3 0.02 262 / 0.1), 0 2px 8px oklch(0.3 0.02 262 / 0.05);
+  --shadow-focus: 0 0 0 2px var(--canvas), 0 0 0 4px var(--ring);
+
+  /* Motion. 150–250ms explains a change without making the user wait. */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --duration-fast: 150ms;
+  --duration-base: 200ms;
+  --duration-slow: 250ms;
+
+  /* Ambient texture strength. */
+  --grain-opacity: 0.028;
+  --glow-opacity: 0.5;
+}
+
+.dark {
+  color-scheme: dark;
+
+  --canvas: oklch(0.176 0.019 264);
+  --canvas-tint: oklch(0.202 0.021 264);
+  --surface: oklch(0.221 0.021 264);
+  --surface-muted: oklch(0.248 0.022 264);
+  --surface-sunken: oklch(0.196 0.02 264);
+  --surface-hover: oklch(0.268 0.024 264);
+
+  --ink: oklch(0.955 0.005 260);
+  --ink-muted: oklch(0.735 0.014 260);
+  --ink-subtle: oklch(0.605 0.016 260);
+  --ink-inverted: oklch(0.185 0.02 264);
+
+  --line-subtle: oklch(0.262 0.018 264);
+  --line: oklch(0.305 0.02 264);
+  --line-strong: oklch(0.375 0.023 264);
+
+  /* Luminous but restrained: bright enough to read, not neon. */
+  --primary: oklch(0.702 0.152 260);
+  --primary-hover: oklch(0.755 0.145 260);
+  --primary-soft: oklch(0.288 0.062 262);
+  --primary-border: oklch(0.4 0.1 261);
+  --primary-ink: oklch(0.16 0.03 262);
+
+  --urgent: oklch(0.712 0.163 30);
+  --urgent-soft: oklch(0.298 0.068 28);
+  --urgent-border: oklch(0.42 0.11 28);
+  --urgent-ink: oklch(0.92 0.05 30);
+
+  --success: oklch(0.735 0.142 158);
+  --success-soft: oklch(0.288 0.058 158);
+  --success-border: oklch(0.4 0.09 158);
+  --success-ink: oklch(0.93 0.05 158);
+
+  --warning: oklch(0.795 0.135 78);
+  --warning-soft: oklch(0.305 0.055 72);
+  --warning-border: oklch(0.43 0.09 74);
+  --warning-ink: oklch(0.94 0.05 82);
+
+  --ring: oklch(0.702 0.152 260);
+
+  --goal-cobalt: oklch(0.7 0.15 260);
+  --goal-teal: oklch(0.715 0.105 195);
+  --goal-violet: oklch(0.705 0.145 300);
+  --goal-amber: oklch(0.795 0.13 76);
+  --goal-coral: oklch(0.715 0.16 28);
+  --goal-moss: oklch(0.72 0.112 148);
+  --goal-slate: oklch(0.685 0.03 258);
+  --goal-rose: oklch(0.725 0.145 8);
+
+  --chart-grid: oklch(0.305 0.02 264);
+  --timeline-line: oklch(0.305 0.02 264);
+  --timeline-now: oklch(0.712 0.163 30);
+
+  --shadow-xs: 0 1px 2px oklch(0 0 0 / 0.3);
+  --shadow-sm: 0 1px 3px oklch(0 0 0 / 0.36), 0 1px 2px oklch(0 0 0 / 0.24);
+  --shadow-md: 0 4px 14px oklch(0 0 0 / 0.4), 0 1px 3px oklch(0 0 0 / 0.28);
+  --shadow-lg: 0 14px 38px oklch(0 0 0 / 0.5), 0 2px 8px oklch(0 0 0 / 0.3);
+
+  --grain-opacity: 0.042;
+  --glow-opacity: 0.32;
+}
+
+/* Expose the tokens to Tailwind as first-class utilities. */
+@theme inline {
+  --color-canvas: var(--canvas);
+  --color-canvas-tint: var(--canvas-tint);
+  --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
+  --color-surface-sunken: var(--surface-sunken);
+  --color-surface-hover: var(--surface-hover);
+
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-ink-subtle: var(--ink-subtle);
+  --color-ink-inverted: var(--ink-inverted);
+
+  --color-line-subtle: var(--line-subtle);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-soft: var(--primary-soft);
+  --color-primary-border: var(--primary-border);
+  --color-primary-ink: var(--primary-ink);
+
+  --color-urgent: var(--urgent);
+  --color-urgent-soft: var(--urgent-soft);
+  --color-urgent-border: var(--urgent-border);
+  --color-urgent-ink: var(--urgent-ink);
+
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-success-border: var(--success-border);
+  --color-success-ink: var(--success-ink);
+
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-warning-border: var(--warning-border);
+  --color-warning-ink: var(--warning-ink);
+
+  --color-ring: var(--ring);
+
+  --color-goal-cobalt: var(--goal-cobalt);
+  --color-goal-teal: var(--goal-teal);
+  --color-goal-violet: var(--goal-violet);
+  --color-goal-amber: var(--goal-amber);
+  --color-goal-coral: var(--goal-coral);
+  --color-goal-moss: var(--goal-moss);
+  --color-goal-slate: var(--goal-slate);
+  --color-goal-rose: var(--goal-rose);
+
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-chart-grid: var(--chart-grid);
+
+  --radius-xs: var(--radius-xs);
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+
+  --shadow-xs: var(--shadow-xs);
+  --shadow-sm: var(--shadow-sm);
+  --shadow-md: var(--shadow-md);
+  --shadow-lg: var(--shadow-lg);
+
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+}
+
+@layer base {
+  * {
+    border-color: var(--line);
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--canvas);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    /* Slightly tighter tracking suits the editorial tone at body size. */
+    letter-spacing: -0.011em;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Headings read as an editorial hierarchy, not as shouting. */
+  h1,
+  h2,
+  h3,
+  h4 {
+    letter-spacing: -0.022em;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  /* Times, counts and durations must not shift width as they tick. */
+  time,
+  [data-numeric] {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: 'tnum';
+  }
+
+  /* One visible, consistent focus ring everywhere. */
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+    border-radius: var(--radius-xs);
+  }
+
+  /* Remove the ring for pointer users without removing it for keyboard users. */
+  :focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  ::selection {
+    background-color: var(--primary-soft);
+    color: var(--ink);
+  }
+
+  ::placeholder {
+    color: var(--ink-subtle);
+  }
+
+  /* Scrollbars that match the surface instead of interrupting it. */
+  @supports selector(::-webkit-scrollbar) {
+    ::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background-color: var(--line-strong);
+      border: 3px solid transparent;
+      background-clip: content-box;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background-color: var(--ink-subtle);
+    }
+  }
+}
+
+@layer utilities {
+  /*
+   * CSS-only film grain. An inline SVG turbulence filter avoids shipping an
+   * image asset and stays crisp at any density.
+   */
+  .grain::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: var(--grain-opacity);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+  }
+
+  /* Soft radial lighting for large empty areas. */
+  .glow-canvas {
+    background-image:
+      radial-gradient(
+        68rem 42rem at 12% -8%,
+        color-mix(in oklab, var(--primary) 9%, transparent),
+        transparent 60%
+      ),
+      radial-gradient(
+        52rem 34rem at 92% 4%,
+        color-mix(in oklab, var(--goal-violet) 7%, transparent),
+        transparent 62%
+      );
+    opacity: var(--glow-opacity);
+  }
+
+  .glow-soft {
+    background-image: radial-gradient(
+      36rem 22rem at 50% 0%,
+      color-mix(in oklab, var(--primary) 7%, transparent),
+      transparent 68%
+    );
+    opacity: var(--glow-opacity);
+  }
+
+  /* Hairline dividers that survive fractional device pixel ratios. */
+  .hairline-t {
+    box-shadow: inset 0 1px 0 var(--line);
+  }
+  .hairline-b {
+    box-shadow: inset 0 -1px 0 var(--line);
+  }
+
+  /* Tactile press feedback for primary controls. */
+  .press {
+    transition:
+      transform var(--duration-fast) var(--ease-out),
+      background-color var(--duration-fast) var(--ease-out),
+      border-color var(--duration-fast) var(--ease-out),
+      box-shadow var(--duration-fast) var(--ease-out);
+  }
+  .press:active:not(:disabled) {
+    transform: scale(0.978);
+  }
+
+  /* Skeleton shimmer used by every loading state. */
+  .skeleton {
+    background-image: linear-gradient(
+      90deg,
+      var(--surface-sunken) 0%,
+      var(--surface-hover) 40%,
+      var(--surface-sunken) 80%
+    );
+    background-size: 300% 100%;
+    animation: shimmer 1.6s var(--ease-in-out) infinite;
+  }
+
+  @keyframes shimmer {
+    from {
+      background-position: 150% 0;
+    }
+    to {
+      background-position: -50% 0;
+    }
+  }
+
+  /* A completed row strikes through and collapses rather than vanishing. */
+  @keyframes collapse-row {
+    from {
+      opacity: 1;
+      max-height: 8rem;
+    }
+    to {
+      opacity: 0;
+      max-height: 0;
+    }
+  }
+
+  @keyframes draw-check {
+    from {
+      stroke-dashoffset: 24;
+    }
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  .animate-draw-check {
+    stroke-dasharray: 24;
+    animation: draw-check var(--duration-slow) var(--ease-out) forwards;
+  }
+
+  /*
+   * Radix enter/exit animations.
+   *
+   * Radix drives `[data-state]`, so animation belongs in CSS keyed off that
+   * attribute rather than in a utility plugin. Overlays fade, popovers scale
+   * from their trigger side, and mobile dialogs rise from the bottom edge —
+   * each motion points back at the element that caused it.
+   */
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+  }
+  @keyframes fade-out {
+    to {
+      opacity: 0;
+    }
+  }
+  @keyframes rise-in {
+    from {
+      transform: translateY(100%);
+    }
+  }
+  @keyframes rise-out {
+    to {
+      transform: translateY(100%);
+    }
+  }
+  @keyframes pop-in {
+    from {
+      opacity: 0;
+      transform: scale(0.96);
+    }
+  }
+  @keyframes pop-out {
+    to {
+      opacity: 0;
+      transform: scale(0.96);
+    }
+  }
+  @keyframes slide-from-right {
+    from {
+      transform: translateX(100%);
+    }
+  }
+  @keyframes slide-to-right {
+    to {
+      transform: translateX(100%);
+    }
+  }
+
+  .anim-overlay[data-state='open'] {
+    animation: fade-in var(--duration-base) var(--ease-out);
+  }
+  .anim-overlay[data-state='closed'] {
+    animation: fade-out var(--duration-fast) var(--ease-out);
+  }
+
+  /* Sheet-from-bottom on mobile, scale-in once there is room to center it. */
+  .anim-sheet[data-state='open'] {
+    animation:
+      fade-in var(--duration-base) var(--ease-out),
+      rise-in var(--duration-slow) var(--ease-out);
+  }
+  .anim-sheet[data-state='closed'] {
+    animation:
+      fade-out var(--duration-fast) var(--ease-out),
+      rise-out var(--duration-base) var(--ease-out);
+  }
+
+  @media (width >= 40rem) {
+    .anim-sheet[data-state='open'] {
+      animation: pop-in var(--duration-base) var(--ease-out);
+    }
+    .anim-sheet[data-state='closed'] {
+      animation: pop-out var(--duration-fast) var(--ease-out);
+    }
+  }
+
+  .anim-drawer[data-state='open'] {
+    animation: slide-from-right var(--duration-slow) var(--ease-out);
+  }
+  .anim-drawer[data-state='closed'] {
+    animation: slide-to-right var(--duration-base) var(--ease-out);
+  }
+
+  .anim-pop[data-state='open'] {
+    animation: pop-in var(--duration-fast) var(--ease-out);
+  }
+  .anim-pop[data-state='closed'] {
+    animation: pop-out 120ms var(--ease-out);
+  }
+
+  /* Screen-reader-only, but focusable for skip links. */
+  .sr-focusable:not(:focus):not(:focus-within) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
+/*
+ * Reduced motion: the product must be fully usable with no animation at all.
+ * Transitions collapse to an imperceptible duration rather than 0s so that
+ * `transitionend` listeners still fire and no state machine stalls.
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .skeleton {
+    animation: none;
+    background-image: none;
+    background-color: var(--surface-sunken);
+  }
+
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* Honour a user's forced-colors preference instead of fighting it. */
+@media (forced-colors: active) {
+  .grain::before,
+  .glow-canvas,
+  .glow-soft {
+    display: none;
+  }
+}
+
+/* Printing a day plan should produce a clean sheet, not a screenshot. */
+@media print {
+  .grain::before,
+  .glow-canvas,
+  .glow-soft,
+  [data-print-hide] {
+    display: none !important;
+  }
+  body {
+    background: #fff;
+    color: #000;
+  }
+}

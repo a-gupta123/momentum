@@ -20,6 +20,10 @@ blob-report/
 .playwright/
 playwright/.cache/
 
+# Full-sweep design review captures (E2E_SHOTS_MODE=review). The curated
+# subset the README embeds lives in public/screenshots/ and IS committed.
+/screenshots/
+
 # env
 .env
 .env*.local

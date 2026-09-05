@@ -182,7 +182,11 @@ function goalAlignmentFactor(
 }
 
 /** How long the task has been waiting since creation, saturating at the configured age. */
-function ageFactor(task: Task, now: Date, config: PriorityConfig): { value: number; detail: string } {
+function ageFactor(
+  task: Task,
+  now: Date,
+  config: PriorityConfig,
+): { value: number; detail: string } {
   const created = parseIso(task.createdAt);
   if (!created) return { value: 0, detail: 'Just added' };
 

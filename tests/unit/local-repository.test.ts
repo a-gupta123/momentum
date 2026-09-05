@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import { toIso } from '@/lib/dates';
 import { buildDaySchedule } from '@/lib/domain/scheduler';
@@ -205,9 +205,7 @@ describe('task lifecycle', () => {
 
     expect(snapshot.tasks.some((task) => task.id === first.id)).toBe(false);
     expect(snapshot.dependencies).toHaveLength(1); // only the seeded edge remains
-    expect(
-      snapshot.dependencies.some((edge) => edge.dependsOnTaskId === first.id),
-    ).toBe(false);
+    expect(snapshot.dependencies.some((edge) => edge.dependsOnTaskId === first.id)).toBe(false);
   });
 
   it('persists a manual reordering of the queue', async () => {
@@ -237,15 +235,13 @@ describe('task lifecycle', () => {
     const task = await repo.createTask({ title: 'Contested' });
     await repo.updateTask(task.id, { title: 'Changed elsewhere' });
 
-    await expect(
-      repo.updateTask(task.id, { title: 'My edit' }, task.updatedAt),
-    ).rejects.toThrow(StaleWriteError);
+    await expect(repo.updateTask(task.id, { title: 'My edit' }, task.updatedAt)).rejects.toThrow(
+      StaleWriteError,
+    );
 
     // The concurrent value survives; the stale edit is discarded.
     const snapshot = await repo.getSnapshot('2026-03-10');
-    expect(snapshot.tasks.find((entry) => entry.id === task.id)?.title).toBe(
-      'Changed elsewhere',
-    );
+    expect(snapshot.tasks.find((entry) => entry.id === task.id)?.title).toBe('Changed elsewhere');
   });
 
   it('records actual minutes on completion', async () => {
@@ -333,9 +329,7 @@ describe('recurring completion', () => {
 
     const snapshot = await repo.getSnapshot('2026-03-10');
     expect(
-      snapshot.tasks.filter(
-        (entry) => entry.recurrenceOccurrenceAt === '2026-03-11T14:00:00.000Z',
-      ),
+      snapshot.tasks.filter((entry) => entry.recurrenceOccurrenceAt === '2026-03-11T14:00:00.000Z'),
     ).toHaveLength(0);
   });
 });
@@ -377,9 +371,7 @@ describe('dependencies', () => {
 
     const snapshot = await repo.getSnapshot('2026-03-10');
     expect(
-      snapshot.dependencies.filter(
-        (edge) => edge.taskId === b.id && edge.dependsOnTaskId === a.id,
-      ),
+      snapshot.dependencies.filter((edge) => edge.taskId === b.id && edge.dependsOnTaskId === a.id),
     ).toHaveLength(1);
   });
 });

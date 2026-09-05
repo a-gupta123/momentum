@@ -53,9 +53,7 @@ export interface CreateTaskInput {
 }
 
 /** Fields a caller may change. Identity and audit columns are excluded. */
-export type UpdateTaskInput = Partial<
-  Omit<Task, 'id' | 'userId' | 'createdAt' | 'updatedAt'>
->;
+export type UpdateTaskInput = Partial<Omit<Task, 'id' | 'userId' | 'createdAt' | 'updatedAt'>>;
 
 export interface CreateGoalInput {
   title: string;
@@ -94,7 +92,12 @@ export type Mutation =
     }
   | { kind: 'delete_task'; id: string }
   | { kind: 'create_goal'; goal: Goal }
-  | { kind: 'update_goal'; id: string; patch: UpdateGoalInput; expectedUpdatedAt: IsoDateTime | null }
+  | {
+      kind: 'update_goal';
+      id: string;
+      patch: UpdateGoalInput;
+      expectedUpdatedAt: IsoDateTime | null;
+    }
   | { kind: 'log_event'; event: ActivityEvent };
 
 /** An operation that reverses part of an applied batch, powering the Undo toast. */

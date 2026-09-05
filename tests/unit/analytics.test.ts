@@ -1,7 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
 import { toIso, zonedTimeToInstant } from '@/lib/dates';
-import { computeInsights, computeStreak, effectiveMinutes, STREAK_RULE } from '@/lib/domain/analytics';
+import {
+  computeInsights,
+  computeStreak,
+  effectiveMinutes,
+  STREAK_RULE,
+} from '@/lib/domain/analytics';
 import type { Task } from '@/lib/domain/types';
 
 import { makeEvent, makeGoal, makeTask } from './factories';
@@ -159,11 +164,7 @@ describe('planned versus actual', () => {
 describe('streaks', () => {
   it('counts consecutive days ending today', () => {
     const streak = computeStreak(
-      [
-        completedTask('2026-03-10'),
-        completedTask('2026-03-09'),
-        completedTask('2026-03-08'),
-      ],
+      [completedTask('2026-03-10'), completedTask('2026-03-09'), completedTask('2026-03-08')],
       NY,
       NOW,
     );
@@ -426,9 +427,9 @@ describe('week comparison', () => {
     });
 
     expect(insights.weekChanges.every((metric) => metric.sentence.length > 0)).toBe(true);
-    expect(
-      insights.weekChanges.find((metric) => metric.key === 'completed_tasks')?.sentence,
-    ).toBe('No activity in either week.');
+    expect(insights.weekChanges.find((metric) => metric.key === 'completed_tasks')?.sentence).toBe(
+      'No activity in either week.',
+    );
   });
 
   it('sums recorded focus minutes from activity events', () => {

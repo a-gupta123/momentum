@@ -20,7 +20,7 @@ export default defineConfig({
     baseURL,
     trace: 'on-first-retry',
     timezoneId: 'America/New_York',
-locale: 'en-US',
+    locale: 'en-US',
   },
   projects: [
     { name: 'desktop-chromium', use: { ...devices['Desktop Chrome'] } },

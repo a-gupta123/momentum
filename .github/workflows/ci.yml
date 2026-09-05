@@ -1,0 +1,69 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# A force-push should not leave three redundant runs queued.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Static analysis and unit tests. Fast, and covers the parts most likely to
+  # break: the priority and scheduling algorithms are pure functions, so they
+  # are fully exercised here without a browser.
+  verify:
+    name: Lint, typecheck, unit tests, build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      # `npm ci` rather than `npm install`: the lockfile is the input, and a
+      # dependency quietly resolving to a new minor should fail CI, not pass it.
+      - run: npm ci
+
+      - run: npm run format:check
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm run test
+
+      # No secrets. The build has to succeed with every integration unset,
+      # because that is exactly the configuration a recruiter clones into.
+      - run: npm run build
+
+  # End-to-end flows against a production build in Guest Demo mode.
+  e2e:
+    name: End-to-end (guest mode)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - run: npx playwright install --with-deps chromium
+
+      - run: npm run build
+
+      - run: npm run e2e
+
+      - uses: actions/upload-artifact@v4
+        # Only useful when something failed, and it is exactly then that the
+        # trace matters most.
+        if: failure()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
